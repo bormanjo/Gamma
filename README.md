@@ -1,5 +1,5 @@
-# Gamma 
-Simple Trading Platform
+# Project Gamma 
+A Simple Trading Platform
 
 This a simple stock trading platform built from the ground up using IPython, myplotlib, and yahoo_finance.
 
