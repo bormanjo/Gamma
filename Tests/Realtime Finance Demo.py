@@ -1,3 +1,5 @@
+import sys
+sys.path.append(r'/Users/jzmanrulz/anaconda/lib/python3.4/site-packages')
 import matplotlib, math, random
 import yahoo_finance as yf
 from matplotlib import pylab
@@ -7,8 +9,9 @@ xbounds = range(0,100,1)
 ybounds = [0]*100
 
 #pull info from yahoo finance for given ticker
-ticker = "GOOG"
+ticker = "ESZ15.CME"
 stock = yf.Share(ticker)
+print(stock.get_days_high())
 high = float(stock.get_days_high())
 low = float(stock.get_days_low())
 
