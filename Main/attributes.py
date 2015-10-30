@@ -47,8 +47,17 @@ class Equity(object):
                      "div_yield":self.equity.get_dividend_yield,
                      "earnings":self.equity.get_earnings_share,
                      "mov_avg_50":self.equity.get_50day_moving_avg,
-                     "mov_avg_200":self.equity.get_200day_moving_avg ,
+                     "mov_avg_200":self.equity.get_200day_moving_avg
                      }
     
     def get_data(self, value):
         return self.data[value]()
+
+
+        
+
+
+
+
+
+
