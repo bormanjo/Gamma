@@ -2,6 +2,8 @@ import json, sys
 sys.path.append(r'/Users/jzmanrulz/anaconda/lib/python3.4/site-packages')
 import yahoo_finance as yf
 
+DATA_FILE = "portfolios.txt"
+
 class Equity(object):
     def __init__(self, symbol):
         self.equity = yf.Share(symbol)
@@ -46,59 +48,100 @@ class Currency(object):
         return self.data[value]()
 
 class DataIO(object):
-	def __init__(self):
-		self.positionVals = ["Net Liquidity","quantity", "trades", "type"]
+    def __init__(self):
+        self.positionVals = ["Net Liquidity","Quantity", "Trades", "Type"]
+        try:
+            open(DATA_FILE, 'x')
+        except FileExistsError:
+            pass       
+    def _load(self):
+        '''returns data from DATA_FILE'''
+        with open(DATA_FILE, 'r') as file:
+            data = json.load(file)
+        return data
+    def _save(self, data):
+        '''saves given data to DATA_FILE'''
+        with open(DATA_FILE, 'w') as file:
+            json.dump(data, file)
+            
     def yf_value(self, obj, symbol, value):
         '''Returns specified value for symbol from YahooFinance API'''
-        if obj == "equity":
+        if obj.lower() == "equity":
             A = Equity(symbol)
-        elif obj == "currency":
+        elif obj.lower() == "currency":
             A = Currency(symbol)
         else:
             return "Invalid command"
         A.get_data("refresh")
         return A.get_data(value)
-    def read_value(self, portfolio, symbol, value):
-        '''Returns a specific value from the portfolio'''
-        with open('portfolios.txt') as file:
-            try:
-                data = json.load(file)
-            except ValueError:
-                data = {}
-            try:
-                return data[portfolio][symbol][value] 
-            except KeyError:
-                return "No value exists in " + portfolio + " for the data specified"
+    def read_value(self, portfolio, symbol, item):
+        '''Returns the item value from a symbol in the portfolio'''
+        try:
+            data = self._load()
+        except ValueError:
+            print("RV Val Error")
+            data = {}
+        try:
+            return data[portfolio][symbol][item] 
+        except KeyError:
+            print("No value exists in ", portfolio, " for the data specified")
+            return None
     def write_value(self, portfolio, symbol, item, value):
-        '''Writes the given data in specified portfolio'''
-        with open('portfolios.txt', 'w+') as file:
-            data = json.load(file)
-            if portfolio not in data:
-                data[portfolio] = {}                #create new portfolio in data
-            if symbol not in data[portfolio]:
-                data[portfolio][symbol] = {}        #create new symbol in portfolio
-                
-            data[portfolio][symbol][item] = value   #add value to item
-            json.dump(data, file)
+        '''Writes a value of an item to the symbol in a portfolio'''
+        data = self._load()
+        if symbol not in data[portfolio]:
+            data[portfolio][symbol] = {}        #create new symbol in portfolio
+        data[portfolio][symbol][item] = value   #add value to item
+        self._save(data)
+    def read_symbols(self, portfolio):
+        '''Returns a list of all current symbols in portfolio'''
+        data = self._load()
+        L = []
+        try:
+            for key, val in data[portfolio].items():
+                L.append(key)
+        except KeyError:
+            pass
+        return L
+    def write_symbol(self, portfolio, symbol, obj):
+        '''Writes data structure skeleton for a symbol'''
+        data = self._load()
+        if symbol not in data[portfolio]:
+            data[portfolio][symbol] = {}
+            for val in self.positionVals:
+                data[portfolio][symbol] = {"Net Liquidity": 0.00,
+                                           "Quantity":0,
+                                           "Trades":[],
+                                           "Type":obj}
+        self._save(data)
     def read_portfolio(self, portfolio):
-        '''Returns current portfolio data'''
-        with open('portfolios.txt') as file:
-            data = json.load(file)
-            try:
-                data[portfolio]
-            except KeyError:
-                print("No portfolio of name '" + portfolio + "' found. Creating portfolio...")
-                self.write_portfolio(portfolio)
-            return data[portfolio]
+        '''Returns dictionary all current portfolio data'''
+        try:
+            data = self._load()
+        except (KeyError, ValueError) as e:
+            print("RP Val Error")
+            data[portfolio] = {}
+        return data[portfolio]
     def write_portfolio(self, name):
         '''Writes a new portfolio'''
-        with open("portfolios.txt", 'w+') as file:
-            try:
-                data = json.load(file)
-            except ValueError:
-                data = {}
-            data[name] = {}
-            json.dump(data, file)
-            print("Portfolio: '", name, "' created.")
+        try:
+            data = self._load()
+        except ValueError:
+            print("WP Val Error")
+            data = {}
+        data[name] = {"_info":{"Name":name, "Liquid Cash":10000.00}}
+        self._save(data)
+        print("Portfolio: '", name, "' created.")
+    def portfolios(self):
+        '''returns a list of all portfolio names in portfolio.txt'''
+        L = []
+        try:
+            data = self._load()
+        except ValueError:
+            print("P Val Error")
+            data = {}
+        for key in data:
+            L.append(key)
+        return L
 
 

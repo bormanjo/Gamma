@@ -1,1 +1,1 @@
-{"newTest": {}}
+{"John": {"_info": {"Liquid Cash": 7614.0, "Name": "John"}, "AAPL": {"Net Liquidity": 2386.0, "Type": "Equity", "Trades": [[119.3, 10, "2015-11-23 01:31:19.628916"], [119.3, 10, "2015-11-23 01:31:27.012767"]], "Quantity": 20}}}
