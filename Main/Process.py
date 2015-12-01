@@ -53,5 +53,3 @@ class Portfolio(object):
         """returns dictionary of data for all current positions in portfolio"""
         return self.Retriever.read_portfolio(self.name)
 
-x = Portfolio("John")
-x.change_position("Equity", "AAPL", 10)

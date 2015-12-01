@@ -5,51 +5,79 @@ import yahoo_finance as yf
 DATA_FILE = "portfolios.txt"
 
 class Equity(object):
-    def __init__(self, symbol):
-        self.equity = yf.Share(symbol)
-        self.data = {
-            "high_52":self.equity.get_year_high,
-            "low_52":self.equity.get_year_low,
-            "high_day":self.equity.get_days_high,
-            "low_day":self.equity.get_days_low,
-            "price":self.equity.get_price,
-            "volume":self.equity.get_volume,
-            "market_cap":self.equity.get_market_cap,
-            "pe":self.equity.get_price_earnings_ratio,
-            "peg":self.equity.get_price_earnings_growth_ratio,
-            "pb":self.equity.get_price_book,
-            "ps":self.equity.get_price_sales,
-            "info":self.equity.get_info,
-            "open":self.equity.get_open,
-            "exchange":self.equity.get_stock_exchange,
-            "ebitda":self.equity.get_ebitda,
-            "div_yield":self.equity.get_dividend_yield,
-            "earnings":self.equity.get_earnings_share,
-            "mov_avg_50":self.equity.get_50day_moving_avg,
-            "mov_avg_200":self.equity.get_200day_moving_avg,
-            "refresh":self.equity.refresh
-            }
-    def get_data(self, value):
-        '''returns the specified data from YahooFinance'''
-        return self.data[value]()
+	def __init__(self, symbol):
+		self.equity = yf.Share(symbol)
+		self.info = {
+			"high_52":"the 52 week high",
+			"low_52":"the 52 week low",
+			"high_day":"the day's high",
+			"low_day":"the day's low",
+			"price":"the current price",
+			"volume":"the current volume of outstanding shares",
+			"market_cap":"total worth of all outstanding shares (price*volume)",
+			"pe":"the price-per-share to earnings-per-share ratio",
+			"peg":"the price-to-earnings-to-growth ratio",
+			"pb":"the price-to-book ratio",
+			"ps":"the price-to-sales ratio",
+			"info":"the info about the symbol",
+			"open":"the day's opening price",
+			"exchange":"the exchange the symbol is listed on",
+			"ebitda":"the earnings before interest, taxes, depreciation and amortization",
+			"div_yield":"the dividend yield",
+			"earnings":"the earnings per share",
+			"mov_avg_50":"the 50 day simple moving average",
+			"mov_avg_200":"the 200 day simple moving average"
+			}
+		self.data = {
+			"high_52":self.equity.get_year_high,
+			"low_52":self.equity.get_year_low,
+			"high_day":self.equity.get_days_high,
+			"low_day":self.equity.get_days_low,
+			"price":self.equity.get_price,
+			"volume":self.equity.get_volume,
+			"market_cap":self.equity.get_market_cap,
+			"pe":self.equity.get_price_earnings_ratio,
+			"peg":self.equity.get_price_earnings_growth_ratio,
+			"pb":self.equity.get_price_book,
+			"ps":self.equity.get_price_sales,
+			"info":self.equity.get_info,
+			"open":self.equity.get_open,
+			"exchange":self.equity.get_stock_exchange,
+			"ebitda":self.equity.get_ebitda,
+			"div_yield":self.equity.get_dividend_yield,
+			"earnings":self.equity.get_earnings_share,
+			"mov_avg_50":self.equity.get_50day_moving_avg,
+			"mov_avg_200":self.equity.get_200day_moving_avg,
+			"refresh":self.equity.refresh
+			}
+	def get_data(self, value):
+		'''returns the specified data from YahooFinance'''
+		return self.data[value]()
         
 class Currency(object):
-    def __init__(self, symbol):
-        self.currency = yf.Currency(symbol)
-        self.data = {
-            "bid":self.currency.get_bid,
-            "ask":self.currency.get_ask,
-            "rate":self.currency.get_rate,
-            "trade_time":self.currency.get_trade_datetime,
-            "refresh":self.currency.refresh
-            }
-    def get_data(self, value):
-        '''returns the specified data from YahooFinance'''
-        return self.data[value]()
+	def __init__(self, symbol):
+		self.currency = yf.Currency(symbol)
+		self.data = {
+			"bid":self.currency.get_bid,
+			"ask":self.currency.get_ask,
+			"rate":self.currency.get_rate,
+			"trade_time":self.currency.get_trade_datetime,
+			"refresh":self.currency.refresh
+			}
+		self.info = {
+			"bid":"the bid price for a currency",
+			"ask":"the ask price for a currency",
+			"rate":"the currency rate",
+			"trade_time":"the time of last trade"
+			}
+	def get_data(self, value):
+		'''returns the specified data from YahooFinance'''
+		return self.data[value]()
 
 class DataIO(object):
     def __init__(self):
         self.positionVals = ["Net Liquidity","Quantity", "Trades", "Type"]
+        self.debug = True
         try:
             open(DATA_FILE, 'x')
         except FileExistsError:
@@ -79,7 +107,7 @@ class DataIO(object):
         try:
             data = self._load()
         except ValueError:
-            print("RV Val Error")
+            if self.debug: print("RV Val Error")
             data = {}
         try:
             return data[portfolio][symbol][item] 
@@ -119,7 +147,7 @@ class DataIO(object):
         try:
             data = self._load()
         except (KeyError, ValueError) as e:
-            print("RP Val Error")
+            if self.debug: print("RP Val Error")
             data[portfolio] = {}
         return data[portfolio]
     def write_portfolio(self, name):
@@ -127,7 +155,7 @@ class DataIO(object):
         try:
             data = self._load()
         except ValueError:
-            print("WP Val Error")
+            if self.debug: print("WP Val Error")
             data = {}
         data[name] = {"_info":{"Name":name, "Liquid Cash":10000.00}}
         self._save(data)
@@ -138,7 +166,7 @@ class DataIO(object):
         try:
             data = self._load()
         except ValueError:
-            print("P Val Error")
+            if self.debug: print("P Val Error")
             data = {}
         for key in data:
             L.append(key)
