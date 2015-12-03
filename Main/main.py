@@ -18,6 +18,7 @@ class Engine(object):
         return "Welcome to Project Gamma Version " + str(self.version)
     
     def run(self):
+		'''Main'''
         print("\n   Type '?' for help, 'portfolio' to invest, or 'quit' to exit")
         while self.running:
             command = str(input("> "))

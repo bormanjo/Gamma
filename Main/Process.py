@@ -1,7 +1,7 @@
 import Data
 from datetime import datetime
 
-class Portfolio(object):
+class Process(object):
     def __init__(self, name):
         self.name = name
         self.standardVals = ["price","high_52","low_52","high_day","low_day","pe"]
@@ -25,21 +25,24 @@ class Portfolio(object):
         '''
         #Setup Symbol's Skeleton Data Structure
         self.Retriever.write_symbol(self.name, symbol, obj)
+		
         #Retrieve Values from Symbol
-        liquidCash = float(self.Retriever.read_value(self.name, "_info", "Liquid Cash"))#Spendable Money
+        cash = float(self.Retriever.read_value(self.name, "_info", "Liquid Cash"))		#Spendable Money
         price = float(self.Retriever.yf_value(obj, symbol, "price"))       
-        liquidVal = float(self.Retriever.read_value(self.name, symbol, "Net Liquidity"))#Value of Trade
+        netValue = float(self.Retriever.read_value(self.name, symbol, "Net Liquidity")) #Value of Trade
         position = int(self.Retriever.read_value(self.name, symbol, "Quantity"))        #Number of Shares owned 
         prevTrades = self.Retriever.read_value(self.name, symbol, "Trades")             #Trade History
+		
         #Modify retrieved values based on input
         quantity = int(quantity)
         position += quantity
-        liquidVal = price * quantity
         prevTrades += [[price, quantity, str(datetime.now())]]
+		
         #Modify Spendable Cash
-        self.Retriever.write_value(self.name, "_info", "Liquid Cash", float(liquidCash)-float(liquidVal))
+        self.Retriever.write_value(self.name, "_info", "Liquid Cash", cash+(price*quantity))
+		
         #Store Trade information and resulting portfolio
-        for item, val in zip(self.Retriever.positionVals,[liquidVal+(price*quantity), position, prevTrades, obj]):
+        for item, val in zip(self.Retriever.positionVals,[netValue+(price*quantity), position, prevTrades, obj]):
             print(item,' ',val)
             self.Retriever.write_value(self.name, symbol, item, val)
         
@@ -52,4 +55,3 @@ class Portfolio(object):
     def get_portfolio(self):
         """returns dictionary of data for all current positions in portfolio"""
         return self.Retriever.read_portfolio(self.name)
-
