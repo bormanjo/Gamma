@@ -2,8 +2,8 @@ import json, sys, base64
 sys.path.append(r'/Users/jzmanrulz/anaconda/lib/python3.4/site-packages')
 import yahoo_finance as yf
 
-DATA_FILE = "portfolios.txt"
-CRED_FILE = "creds.txt"
+DATA_FILE = "portfolios.PGF"
+CRED_FILE = "creds.PGF"
 
 class Equity(object):
     def __init__(self, symbol):
@@ -105,9 +105,12 @@ class Credentials(object):
     def login(self, usr, psswrd):
         '''Returns True or False if login credentials are valid'''
         log = self._load()
-        inputPass = self.encode(psswrd)
-        logPass = log[self.encode(usr)]
-        return  logPass == inputPass 
+        try:
+            inputPass = self.encode(psswrd)
+            logPass = log[self.encode(usr)]
+            return  logPass == inputPass
+        except KeyError:
+            return False
     def user_exists(self, usr):
         '''Returns True or False if username is already registered'''
         log = self._load()

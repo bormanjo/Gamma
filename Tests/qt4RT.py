@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import sys
+sys.path.append(r'/Users/jzmanrulz/anaconda/lib/python3.4/site-packages')
 import os
 import random
 from matplotlib.backends import qt4_compat
