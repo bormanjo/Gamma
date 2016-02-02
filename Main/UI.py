@@ -4,12 +4,12 @@ from distutils.util import strtobool
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-debug = True
+debug = False
 
 class UI(object):
     def __init__(self):
         self.running = True
-        self.version = "Alpha 0.6"
+        self.version = "Beta 1.0"
         self.actions = {
                         "about":self.about,
                         "quit":exit,
@@ -54,11 +54,7 @@ class UI(object):
         '''Switch to terminal functionality'''
         if debug: print("$Go to Terminal")
         Term = Terminal()
-        Term.run()
-    def analyze(self):
-        '''Switch to Analysis functionality'''
-        if debug: print("$Go to Anaylysis")
-        
+        Term.run()       
     def logIn(self):
         '''Initiates user login assuming user is registered'''
         if debug: print('$LogIn')
@@ -215,11 +211,11 @@ class Terminal(object):
                 if action == 'quit':
                     print("Returning to Main Menu")
                     inTerminal = False
+                    break
                 elif action == 'help': self.get_instructions()
                 elif action == 'clear': clear()
                 else:
                     print(self.get_action(parseInput(action)))
-            print("returning to Main")
         def get_action(self, action):
             '''Given a Command List, retrieves the specified data'''
             try:
@@ -228,11 +224,11 @@ class Terminal(object):
                 elif action[0] == "currency":
                     symObj = Data.Currency(action[1])                    
                 print(action[2],": ", symObj.get_data(action[2]))
-            except (KeyError, UnboundLocalError) as e:
+            except (KeyError, UnboundLocalError, IndexError) as e:
                 if e == KeyError:
                     print("The command ",action[2]," is not recognized for the symbol ", action[1])
                 else:
-                    print("The specified object type is invalid")
+                    print("The command ", action," is not recognized")
         def get_instructions(self):
             '''Prints a list of recognized commands for Equities and Currencies'''
             if debug: print("$Get Instructions")
